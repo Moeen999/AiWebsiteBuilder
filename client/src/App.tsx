@@ -6,6 +6,7 @@ import Preview from "./pages/Preview";
 import Community from "./pages/Community";
 import View from "./pages/View";
 import Home from "./pages/Home";
+import Navbar from "./components/Navbar";
 
 const routes = [
   { path: "/", element: <Home /> },
@@ -20,11 +21,14 @@ const routes = [
 
 const App = () => {
   return (
-    <Routes>
-      {routes.map(({ path, element }) => (
-        <Route key={path} path={path} element={element} />
-      ))}
-    </Routes>
+    <div>
+      <Navbar/>
+      <Routes>
+        {routes.map(({ path, element }) => (
+          <Route key={path} path={path} element={element} />
+        ))}
+      </Routes>
+    </div>
   );
 };
 

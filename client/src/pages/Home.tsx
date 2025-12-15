@@ -4,14 +4,14 @@ import { useState } from "react";
 
 const Home = () => {
   const [input, setInput] = useState("");
-  const [isLoading,setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
-    setInput('')
-    setIsLoading(true)
+    setInput("");
+    setIsLoading(true);
     setTimeout(() => {
-      setIsLoading(false)
+      setIsLoading(false);
     }, 4000);
   };
   return (
@@ -51,8 +51,8 @@ const Home = () => {
         </h1>
 
         <p className="text-center text-base max-w-md mt-2">
-          Create, customize and launch websites faster than ever with our AI
-          Website Builder. powered by AI.
+          Create, customize and publish websites faster than ever with our AI
+          Website Builder.
         </p>
 
         <form
@@ -68,9 +68,14 @@ const Home = () => {
             value={input}
           />
           <button className="ml-auto flex items-center gap-2 bg-gradient-to-r from-[#CB52D4] to-indigo-600 rounded-md px-4 py-2">
-            {!isLoading ? "Create with AI" : (<>
-            Creating <Loader2Icon className="animate-spin size-4 text-white"/>
-            </>)}
+            {!isLoading ? (
+              "Create with AI"
+            ) : (
+              <>
+                Creating{" "}
+                <Loader2Icon className="animate-spin size-4 text-white" />
+              </>
+            )}
           </button>
         </form>
 
