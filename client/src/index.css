@@ -15,3 +15,8 @@ body{
     cursor: pointer;
   }
 }
+
+
+.no-scrollBar ::-webkit-scrollbar{
+  display: none;
+}

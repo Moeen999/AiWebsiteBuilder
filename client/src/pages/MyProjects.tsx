@@ -28,7 +28,7 @@ const MyProjects = () => {
       <div className="px-4 md:px-16 lg:px-24 xl:px-32">
         {isLoading ? (
           <div className="flex items-center justify-center h-[80vh]">
-            <Loader2Icon className="size-12 animate-spin text-indigo-300" />
+            <Loader2Icon className="size-7 animate-spin text-indigo-300" />
           </div>
         ) : projects.length > 0 ? (
           <div className="py-10 min-h-[80vh]">
