@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Project } from "../types";
 import {
@@ -14,7 +14,15 @@ import {
   TabletIcon,
   XIcon,
 } from "lucide-react";
-import { dummyConversations, dummyProjects } from "../assets/assets";
+import {
+  dummyConversations,
+  dummyProjects,
+  dummyVersion,
+} from "../assets/assets";
+import Sidebar from "../components/Sidebar";
+import ProjectReview, {
+  type ProjectPreviewRef,
+} from "../components/ProjectReview";
 
 const Projects = () => {
   const { projectId } = useParams();
@@ -28,12 +36,17 @@ const Projects = () => {
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const previewRef = useRef<ProjectPreviewRef>(null);
 
   const fetchProjectData = async () => {
     const project = dummyProjects.find((project) => project.id === projectId);
     setTimeout(() => {
       if (project) {
-        setProject({ ...project, conversation: dummyConversations });
+        setProject({
+          ...project,
+          conversation: dummyConversations,
+          versions: dummyVersion,
+        });
         setIslaoding(false);
         setIsgenerating(project.current_code ? false : true);
       }
@@ -152,8 +165,20 @@ const Projects = () => {
         </div>
       </div>
       <div className="flex flex-1 overflow-auto">
-        <div>Sidebar</div>
-        <div className="flex-1 pl-0 p-2">Project Preview</div>
+        <Sidebar
+          isGenerating={isGenerating}
+          project={project}
+          isMenuOpen={isMenuOpen}
+          setIsgenerating={setIsgenerating}
+          setProject={(p) => setProject(p)}
+        />
+
+        <ProjectReview
+          isGenerating={isGenerating}
+          ref={previewRef}
+          project={project}
+          device={device}
+        />
       </div>
     </div>
   ) : (
