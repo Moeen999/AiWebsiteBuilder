@@ -12,7 +12,7 @@ const MyProjects = () => {
     setProjects(dummyProjects);
     setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 200);
   };
 
   const deleteProject = (projectId: string) => {};

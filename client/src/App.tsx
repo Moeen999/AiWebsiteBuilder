@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Pricing from "./pages/Pricing";
 import Projects from "./pages/Projects";
 import MyProjects from "./pages/MyProjects";
@@ -20,9 +20,14 @@ const routes = [
 ];
 
 const App = () => {
+  const { pathname } = useLocation();
+  const pagesNavbar =
+    (pathname.startsWith("/projects/") && pathname !== "/projects") ||
+    pathname.startsWith("/view/") ||
+    pathname.startsWith("/preview/");
   return (
     <div>
-      <Navbar/>
+      {!pagesNavbar && <Navbar/>}
       <Routes>
         {routes.map(({ path, element }) => (
           <Route key={path} path={path} element={element} />

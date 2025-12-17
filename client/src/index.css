@@ -7,9 +7,7 @@
 body{
   background-color: black;
 }
-/* ::-webkit-scrollbar{
-  display: none;
-} */
+
 @layer base {
   button {
     cursor: pointer;
@@ -17,6 +15,6 @@ body{
 }
 
 
-.no-scrollBar ::-webkit-scrollbar{
+.no-scrollBar::-webkit-scrollbar{
   display: none;
 }
