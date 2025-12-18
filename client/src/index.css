@@ -18,3 +18,18 @@ body{
 .no-scrollBar::-webkit-scrollbar{
   display: none;
 }
+
+.animate-fade-in{
+  animation: animate 0.7s ease-out;
+}
+
+@keyframes animate {
+   0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
