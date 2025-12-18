@@ -53,7 +53,7 @@ const EditorPanel = ({
           onClick={onClose}
           className="p-1 hover:bg-gray-100  rounded-full"
         >
-          <X className="w-4 h-4 bg-black text-white rounded-full text-shadow-gray-500" />
+          <X className="w-4 h-4 text-gray-600 text-shadow-gray-500" />
         </button>
       </div>
       <div className="space-y-4 text-black">
