@@ -1,6 +1,7 @@
-import { forwardRef, useRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import type { Project } from "../types";
 import { iframeScript } from "../assets/assets";
+import EditorPanel from "./EditorPanel";
 
 interface ProjectPreviewProps {
   project: Project;
@@ -17,6 +18,32 @@ const ProjectReview = forwardRef<ProjectPreviewRef, ProjectPreviewProps>(
     ref
   ) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    const [selectedEelemnt, setSelectedElement] = useState<any>(null);
+
+    useEffect(() => {
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data.type === "ELEMENT_SELECTED") {
+          setSelectedElement(event.data.payload);
+        } else if (event.data.type === "CLEAR_SELECTION") {
+          setSelectedElement(null);
+        }
+      };
+      window.addEventListener("message", handleMessage);
+      return () => window.removeEventListener("message", handleMessage);
+    }, []);
+
+    const handleUpdate = (updates: any) => {
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: "UPDATE_ELEMENT",
+            payload: updates,
+          },
+          "*"
+        );
+      }
+    };
+
     const injectPreview = (html: string) => {
       if (!html) return "";
       if (!showEditorPanel) return html;
@@ -39,7 +66,24 @@ const ProjectReview = forwardRef<ProjectPreviewRef, ProjectPreviewProps>(
               ref={iframeRef}
               srcDoc={injectPreview(project.current_code)}
               className={`h-full max-sm:w-full mx-auto transition-all ${resolutions[device]}`}
-            ></iframe>
+            />
+            {showEditorPanel && selectedEelemnt && (
+              <EditorPanel
+                selectedEelemnt={selectedEelemnt}
+                onUpdate={handleUpdate}
+                onClose={() => {
+                  setSelectedElement(null);
+                  if (iframeRef.current?.contentWindow) {
+                    iframeRef.current.contentWindow.postMessage(
+                      {
+                        type: "CLEAR_SELECTION_REQUEST",
+                      },
+                      "*"
+                    );
+                  }
+                }}
+              />
+            )}
           </>
         ) : (
           <div>loading</div>
