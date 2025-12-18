@@ -59,9 +59,26 @@ const Projects = () => {
 
   const saveProject = async () => {};
 
+  // ! dowload html code (index.html)
+
+  const downloadCode = () => {
+    const htmlCode = previewRef.current?.getCode || project?.current_code;
+    if (!htmlCode) {
+      if (isGenerating) {
+        return;
+      }
+      return;
+    }
+    const elem = document.createElement("a");
+    const file = new Blob([htmlCode], { type: "text/html" });
+    elem.href = URL.createObjectURL(file);
+    elem.download = "index.html";
+    document.body.appendChild(elem);
+    elem.click()
+  };
+
   const togglePublish = async () => {};
 
-  const downloadCode = () => {};
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">

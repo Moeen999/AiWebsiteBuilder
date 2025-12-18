@@ -1,4 +1,10 @@
-import { forwardRef, useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import type { Project } from "../types";
 import { iframeScript } from "../assets/assets";
 import EditorPanel from "./EditorPanel";
@@ -57,6 +63,32 @@ const ProjectReview = forwardRef<ProjectPreviewRef, ProjectPreviewProps>(
       tablet: "w-[768px]",
       desktop: "w-full",
     };
+
+    useImperativeHandle(ref, () => ({
+      getCode: () => {
+        const doc = iframeRef.current?.contentDocument;
+        if (!doc) return undefined;
+        //! remove classes
+        doc
+          .querySelectorAll(".ai-selected-element,[data-ai-selected]")
+          .forEach((elem) => {
+            elem.classList.remove("ai-selected-element");
+            elem.removeAttribute("data-ai-selected");
+            (elem as HTMLElement).style.outline = "";
+          });
+
+        //! remove injected script + styles 
+        const previewScript = doc.getElementById("ai-preview-script");
+        if (previewScript) return previewScript.remove();
+
+        const previewStyles = doc.getElementById("ai-preview-style");
+        if (previewStyles) return previewStyles.remove();
+
+        //! clean html searialization
+        const html = doc.documentElement.outerHTML;
+        return html;
+      },
+    }));
 
     return (
       <div className="relative h-full bg-gray-900 rounded-xl flex-1 overflow-hidden max-sm:ml-2">
