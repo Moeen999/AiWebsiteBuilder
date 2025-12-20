@@ -7,6 +7,9 @@ import Community from "./pages/Community";
 import View from "./pages/View";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
+import { Toaster } from "sonner";
+import AuthPage from "./pages/auth/AuthPage";
+import { authClient } from "./lib/auth-client";
 
 const routes = [
   { path: "/", element: <Home /> },
@@ -17,22 +20,34 @@ const routes = [
   { path: "/preview/:projectId/:versionId", element: <Preview /> },
   { path: "/community", element: <Community /> },
   { path: "/view/:projectId", element: <View /> },
+  { path: "/auth/:pathname", element: <AuthPage /> },
 ];
 
 const App = () => {
   const { pathname } = useLocation();
+  const { data: session } = authClient.useSession();
   const pagesNavbar =
     (pathname.startsWith("/projects/") && pathname !== "/projects") ||
     pathname.startsWith("/view/") ||
     pathname.startsWith("/preview/");
   return (
     <div>
-      {!pagesNavbar && <Navbar/>}
-      <Routes>
-        {routes.map(({ path, element }) => (
-          <Route key={path} path={path} element={element} />
-        ))}
-      </Routes>
+      {!session?.user ? (
+        <>
+        <Navbar/>
+        <AuthPage />
+        </>
+      ) : (
+        <>
+          <Toaster />
+          {!pagesNavbar && <Navbar />}
+          <Routes>
+            {routes.map(({ path, element }) => (
+              <Route key={path} path={path} element={element} />
+            ))}
+          </Routes>
+        </>
+      )}
     </div>
   );
 };
