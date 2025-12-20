@@ -10,6 +10,7 @@ import Navbar from "./components/Navbar";
 import { Toaster } from "sonner";
 import AuthPage from "./pages/auth/AuthPage";
 import { authClient } from "./lib/auth-client";
+import UserSettings from "./pages/UserSettings";
 
 const routes = [
   { path: "/", element: <Home /> },
@@ -21,6 +22,7 @@ const routes = [
   { path: "/community", element: <Community /> },
   { path: "/view/:projectId", element: <View /> },
   { path: "/auth/:pathname", element: <AuthPage /> },
+  { path: "/account/settings", element: <UserSettings/> },
 ];
 
 const App = () => {
