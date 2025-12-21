@@ -301,3 +301,15 @@ export const togglePublishProject = async (req: Request, res: Response) => {
         })
     }
 }
+
+
+// ! purchase credits (will be done after the implementaion of STRIPE payment Gateway)
+
+export const purchaseCredits = async (req: Request, res: Response) => {
+    try {
+    } catch (error: any) {
+
+    }
+}
+
+
