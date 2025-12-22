@@ -14,15 +14,13 @@ import {
   TabletIcon,
   XIcon,
 } from "lucide-react";
-import {
-  dummyConversations,
-  dummyProjects,
-  dummyVersion,
-} from "../assets/assets";
 import Sidebar from "../components/Sidebar";
 import ProjectReview, {
   type ProjectPreviewRef,
 } from "../components/ProjectReview";
+import { authClient } from "@/lib/auth-client";
+import api from "@/configs/axios";
+import { toast } from "sonner";
 
 const Projects = () => {
   const { projectId } = useParams();
@@ -37,25 +35,36 @@ const Projects = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const previewRef = useRef<ProjectPreviewRef>(null);
+  const { data: session, isPending } = authClient.useSession();
 
   const fetchProjectData = async () => {
-    const project = dummyProjects.find((project) => project.id === projectId);
-    setTimeout(() => {
-      if (project) {
-        setProject({
-          ...project,
-          conversation: dummyConversations,
-          versions: dummyVersion,
-        });
-        setIslaoding(false);
-        setIsgenerating(project.current_code ? false : true);
-      }
-    }, 2000);
+    try {
+      const { data } = await api.get(`/api/user/project/${projectId}`);
+      setProject(data?.project);
+      setIsgenerating(data?.project?.current_code ? false : true);
+      setIslaoding(false);
+    } catch (error: any) {
+      setIslaoding(false);
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    fetchProjectData();
-  });
+    if (session?.user) {
+      fetchProjectData();
+    } else if (!isPending && !session?.user) {
+      navigate("/");
+      toast.error("Please login first to view your project");
+    }
+  }, [session?.user]);
+
+  useEffect(() => {
+    if (project && !project.current_code) {
+      const fetchInterval = setInterval(fetchProjectData(), 10000);
+      return clearInterval(fetchInterval);
+    }
+  }, [project]);
 
   const saveProject = async () => {};
 
@@ -74,7 +83,7 @@ const Projects = () => {
     elem.href = URL.createObjectURL(file);
     elem.download = "index.html";
     document.body.appendChild(elem);
-    elem.click()
+    elem.click();
   };
 
   const togglePublish = async () => {};

@@ -6,7 +6,7 @@ import openai from "../configs/openai.js";
 export const makeRevisions = async (req: Request, res: Response) => {
     const userId = req.userId;
     try {
-        const { projectId } = req.body;
+        const { projectId } = req.params;
         const { message } = req.body;
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!userId || !user) {
@@ -47,7 +47,7 @@ export const makeRevisions = async (req: Request, res: Response) => {
         // ! Enhance Prompt 
 
         const promptEnhanceRes = await openai.chat.completions.create({
-            model: "z-ai/glm-4.5-air:free",
+            model: "kwaipilot/kat-coder-pro:free",
             messages: [
                 {
                     role: "system",
@@ -89,7 +89,7 @@ export const makeRevisions = async (req: Request, res: Response) => {
 
         // ! generate website code
         const codeGenerationRes = await openai.chat.completions.create({
-            model: "z-ai/glm-4.5-air:free",
+            model: "kwaipilot/kat-coder-pro:free",
             messages: [
                 {
                     role: "system",
@@ -113,6 +113,21 @@ export const makeRevisions = async (req: Request, res: Response) => {
         });
 
         const code = codeGenerationRes.choices[0].message.content || "";
+
+        if (!code) {
+            await prisma.conversation.create({
+                data: {
+                    role: "assistant",
+                    content: "Unable to generate the code. Please try again.",
+                    projectId
+                }
+            })
+            await prisma.user.update({
+                where: { id: userId },
+                data: { credits: { increment: 5 } }
+            })
+            return;
+        }
         const version = await prisma.version.create({
             data: {
                 code: code.replace(/```[a-z]*\n?/gi, '').replace(/```$/g, '').trim(),
@@ -277,7 +292,7 @@ export const getPublishedProjects = async (req: Request, res: Response) => {
 
 export const getProjectById = async (req: Request, res: Response) => {
     try {
-        const { projectId } = req.params
+        const { projectId } = req.params;
         const project = await prisma.websiteProject.findFirst({
             where: { id: projectId }
         })
@@ -326,7 +341,7 @@ export const saveProjectCode = async (req: Request, res: Response) => {
                 current_version_index: ''
             }
         })
-        res.json({ message:"Project saved successfullly!" });
+        res.json({ message: "Project saved successfullly!" });
     } catch (error: any) {
         console.log(error.code || error.message);
         res.status(500).json({ message: error.message })
