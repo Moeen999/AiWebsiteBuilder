@@ -254,22 +254,38 @@ export const getProjectPreview = async (req: Request, res: Response) => {
 
 }
 
+//! get published Projects
 
-// ! controller func to get published projects
 
 export const getPublishedProjects = async (req: Request, res: Response) => {
     try {
-        const { projectId } = req.params;
 
-        const project = await prisma.websiteProject.findFirst({
+        const projects = await prisma.websiteProject.findMany({
             where: { isPublished: true },
+            include: { user: true }
         })
 
-        if (!project || project.isPublished === false || !project?.current_code) {
+        res.json({ projects });
+    } catch (error: any) {
+        console.log(error.code || error.message);
+        res.status(500).json({ message: error.message })
+    }
+
+}
+
+// ! get a single project by "id" 
+
+export const getProjectById = async (req: Request, res: Response) => {
+    try {
+        const { projectId } = req.params
+        const project = await prisma.websiteProject.findFirst({
+            where: { id: projectId }
+        })
+
+        if (!project || project.isPublished === false || !project.current_code) {
             return res.status(404).json({ message: "Project not found!" });
         }
-
-        res.json({ code: project.current_code });
+        res.json({ code: project?.current_code });
     } catch (error: any) {
         console.log(error.code || error.message);
         res.status(500).json({ message: error.message })
@@ -278,16 +294,19 @@ export const getPublishedProjects = async (req: Request, res: Response) => {
 }
 
 
-// ! controller func to save project code
+
+// ! controller to save a project
 
 export const saveProjectCode = async (req: Request, res: Response) => {
     try {
         const userId = req.userId;
         const { projectId } = req.params;
         const code = req.body;
+
         if (!userId) {
-            return res.status(401).json({ message: "Un-Authorized User" });
+            return res.status(401).json({ message: "Un-Authorized User!" });
         }
+
         if (!code) {
             return res.status(404).json({ message: "Code is required!" });
         }
@@ -295,16 +314,19 @@ export const saveProjectCode = async (req: Request, res: Response) => {
         const project = await prisma.websiteProject.findUnique({
             where: { id: projectId, userId }
         })
+
         if (!project) {
-            return res.status(404).json({ message: "Project not found!" });
+            return res.status(404).json({ message: "Project not found" });
         }
 
         await prisma.websiteProject.update({
-            where: { id: projectId },
-            data: { current_code: code, current_version_index: '' }
+            where: { id: projectId, userId },
+            data: {
+                current_code: code,
+                current_version_index: ''
+            }
         })
-
-        res.json({ message: "Project saved succesfully!" });
+        res.json({ message:"Project saved successfullly!" });
     } catch (error: any) {
         console.log(error.code || error.message);
         res.status(500).json({ message: error.message })
