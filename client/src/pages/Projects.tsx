@@ -61,7 +61,7 @@ const Projects = () => {
 
   useEffect(() => {
     if (project && !project.current_code) {
-      const fetchInterval = setInterval(fetchProjectData(), 10000);
+      const fetchInterval = setInterval(fetchProjectData, 10000);
       return clearInterval(fetchInterval);
     }
   }, [project]);

@@ -6,8 +6,10 @@ import {
   UserIcon,
 } from "lucide-react";
 import type { Message, Project, Version } from "../types";
-import { Link } from "react-router-dom";
+import { data, Link } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
+import api from "@/configs/axios";
+import { toast } from "sonner";
 
 interface SidebarProps {
   project: Project;
@@ -28,14 +30,58 @@ const Sidebar = ({
   const [input, setIpnut] = useState("");
   const messageRef = useRef<HTMLDivElement>(null);
 
-  const handleRollBack = async (versionId: string) => {};
+  const handleRollBack = async (versionId: string) => {
+    try {
+      const confirm = window.confirm(
+        "Are you sure you want to roll back to this version?"
+      );
+      if (!confirm) return;
+      setIsgenerating(true);
+      const { data } = await api.get(
+        `/api/project/rollback/${project.id}/${versionId}`
+      );
+
+      const { data: data2 } = await api.get(`/api/user/project/${project.id}`);
+      toast.success(data.message);
+      setProject(data2?.project);
+      setIsgenerating(false);
+    } catch (error: any) {
+      setIsgenerating(false);
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
+  };
+  const fetchProject = async () => {
+    try {
+      const { data } = await api.get(`/api/user/project/${project.id}`);
+      setProject(data?.project);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
+  };
 
   const handleRevisions = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsgenerating(true);
-    setTimeout(() => {
+    let interval: number | undefined;
+    try {
+      setIsgenerating(true);
+      interval = setInterval(() => {
+        fetchProject();
+      }, 10000);
+      const { data } = await api.post(`/api/project/revision/${project.id}`, {
+        message: input,
+      });
+      fetchProject();
+      toast.success(data?.message);
+      setIpnut("");
+      clearInterval(interval);
       setIsgenerating(false);
-    }, 3000);
+    } catch (error: any) {
+      setIsgenerating(false);
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
   useEffect(() => {
