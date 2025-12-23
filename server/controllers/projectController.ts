@@ -316,7 +316,7 @@ export const saveProjectCode = async (req: Request, res: Response) => {
     try {
         const userId = req.userId;
         const { projectId } = req.params;
-        const code = req.body;
+        const { code } = req.body;
 
         if (!userId) {
             return res.status(401).json({ message: "Un-Authorized User!" });
@@ -335,7 +335,7 @@ export const saveProjectCode = async (req: Request, res: Response) => {
         }
 
         await prisma.websiteProject.update({
-            where: { id: projectId, userId },
+            where: { id: projectId },
             data: {
                 current_code: code,
                 current_version_index: ''

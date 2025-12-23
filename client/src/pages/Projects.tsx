@@ -66,7 +66,23 @@ const Projects = () => {
     }
   }, [project]);
 
-  const saveProject = async () => {};
+  const saveProject = async () => {
+    if (!previewRef.current) return;
+    const code = previewRef.current.getCode();
+    if (!code) return;
+    setIsSaving(true);
+    try {
+      const { data } = await api.put(`/api/project/save/${projectId}`, {
+        code,
+      });
+      toast.success(data.message);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // ! dowload html code (index.html)
 
@@ -86,7 +102,18 @@ const Projects = () => {
     elem.click();
   };
 
-  const togglePublish = async () => {};
+  const togglePublish = async () => {
+    try {
+      const { data } = await api.get(`/api/user/publish-toggle/${projectId}`);
+      toast.success(data.message);
+      setProject((prev) =>
+        prev ? { ...prev, isPublished: !prev.isPublished } : null
+      );
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
+  };
 
   if (isLoading) {
     return (
