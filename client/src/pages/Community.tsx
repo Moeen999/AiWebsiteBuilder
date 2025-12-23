@@ -2,25 +2,28 @@ import { useEffect, useState } from "react";
 import type { Project } from "../types";
 import { Loader2Icon, PlusIcon, TrashIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { dummyProjects } from "../assets/assets";
 import Footer from "../components/Footer";
+import { authClient } from "@/lib/auth-client";
+import api from "@/configs/axios";
+import { toast } from "sonner";
 
 const Community = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const fetchProjectsData = async () => {
-    setProjects(dummyProjects);
-    setTimeout(() => {
+    try {
+      const { data } = await api.get("/api/project/published");
+      setProjects(data?.projects);
       setIsLoading(false);
-    }, 50);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
-
   useEffect(() => {
-    (async () => {
-      await fetchProjectsData();
-    })();
-  }, []);
+    fetchProjectsData();
+}, []);
   const navigate = useNavigate();
   return (
     <>
@@ -71,17 +74,15 @@ const Community = () => {
                     <p className="text-gray-400 mt-1 text-sm line-clamp-2">
                       {project.initial_prompt}
                     </p>
-                    <div
-                      className="flex justify-between mt-6 items-center "
-                    >
+                    <div className="flex justify-between mt-6 items-center ">
                       <span className="text-gray-500 text-xs">
                         {new Date(project.createdAt).toLocaleDateString()}
                       </span>
                       <div className="flex gap-3 text-sm">
-                        <button
-                          className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-md transition-all flex items-center gap-2 transition-colors"
-                        >
-                          <span className="bg-gray-200 size-4.5 rounded-full text-black font-semibold flex items-center justify-center">{project?.user?.name?.slice(0,1)}</span>
+                        <button className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-md transition-all flex items-center gap-2 transition-colors">
+                          <span className="bg-gray-200 size-4.5 rounded-full text-black font-semibold flex items-center justify-center">
+                            {project?.user?.name?.slice(0, 1)}
+                          </span>
                           {project?.user?.name}
                         </button>
                       </div>
@@ -91,7 +92,7 @@ const Community = () => {
                     <TrashIcon
                       className="absolute top-3 right-3 scale-0 group-hover:scale-100 bg-white p-1.5 size-7 rounded text-red-500 text-xl cursor-pointer transition-all"
                       onClick={() => deleteProject(project.id)}
-                    />  
+                    />
                   </div>
                 </Link>
               ))}

@@ -5,6 +5,7 @@ import { authClient } from "@/lib/auth-client";
 import { UserButton } from "@daveyplate/better-auth-ui";
 import api from "@/configs/axios";
 import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -65,8 +66,15 @@ const Navbar = () => {
             </button>
           ) : (
             <>
-              <button className="bg-white/10 px-5 py-1.5 text-xs sm:text-sm border text-gray-200 rounded-full">
-                Credits: <span className="text-indigo-300">{credits}</span>
+              <button className="flex justify-center items-center gap-1 bg-white/10 px-5 py-1.5 text-xs sm:text-sm border text-gray-200 rounded-full">
+                Credits:
+                <span className="text-indigo-300">
+                  {!credits ? (
+                    <Loader2Icon className="size-5 p-1 animate-spin text-white" />
+                  ) : (
+                    credits
+                  )}
+                </span>
               </button>
               <UserButton size="icon" />
             </>

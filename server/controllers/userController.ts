@@ -265,7 +265,7 @@ export const getUserProjects = async (req: Request, res: Response) => {
         }
 
         const projects = await prisma.websiteProject.findMany({
-            where: { id: userId },
+            where: { userId },
             orderBy: { updatedAt: "desc" }
         })
         res.json({
